@@ -16,10 +16,19 @@ class TodoAdd extends React.Component {
     };
   };
 
+  /**
+   * Updates state key 'name.
+   * @param {*} e user event.
+   */
   onChange = e => {
     this.setState({ name: e.target.value });
   };
 
+  /**
+   * Hanldes key press events of input.
+   * On 'enter' stores user response.
+   * @param {*} e user event.
+   */
   onKeyUp = e => {
     const { mutate } = this.props;
 

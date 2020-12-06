@@ -104,7 +104,7 @@ class Todo {
     }
 
     if (typeof params.parentId === "string" && params.parentId.trim() !== "") {
-      toUpdate[ "parentId" ] = params.parentId;
+      toUpdate[ "parentId" ] = (params.parentId === "none") ? null : params.parentId;
     }
 
     let updateError

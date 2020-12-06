@@ -12,6 +12,9 @@ import './../../styles/header.css';
 const Header = () => {
   const history = useHistory();
 
+  /**
+   * Logout from application.
+   */
   const logout = () => {
     localStorage.removeItem("authenticated");
     history.push("/");

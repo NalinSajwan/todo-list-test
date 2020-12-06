@@ -2,6 +2,8 @@ import React from 'react';
 import { graphql } from "react-apollo";
 
 import TreeView from 'devextreme-react/tree-view';
+import Sortable from 'devextreme-react/sortable';
+
 import isEqual from 'lodash/isEqual';
 
 import { copyJSON } from './../../constants/CommonFunctions';
@@ -24,7 +26,7 @@ class TreeViewComp extends React.Component {
     this.treeViewRef = React.createRef();
 
     this.state = {
-      items: copyJSON(props.items),
+      items: copyJSON(props.items).map(v => { v.expanded = true; return v; }),
       view: "all"
     };
 
@@ -38,10 +40,15 @@ class TreeViewComp extends React.Component {
     let itemsEqual = isEqual(prevProps.items, this.props.items);
 
     if (!itemsEqual) {
-      this.setState({ items: copyJSON(this.props.items) });
+      this.setState({ items: copyJSON(this.props.items).map(v => { v.expanded = true; return v; }) });
     }
   };
 
+  /**
+   * Filters todo list items based on view.
+   * @param {string} view Filter view of todo list.
+   * @returns {array}
+   */
   getFilteredItems = (view) => {
 
     let items = copyJSON(this.state.items);
@@ -59,20 +66,58 @@ class TreeViewComp extends React.Component {
     return items;
   };
 
+  /**
+   * Set filter view.
+   * @param {string} view View of todo list.
+   */
   setView = (view) => {
     this.setState({ view });
   };
 
+  /**
+   * Sets "complete" field of items.
+   * @param {array} nodes All todo list items.
+   * @param {*} selected All selected items,
+   */
+  setCompletion = (nodes, selected) => {
+
+    let selectedItems = {};
+
+    // Setting ids that are completed;
+    for (let i = 0; i < selected.length; i++) {
+      selectedItems[ selected[i].key ] = true;
+    };
+
+    // Set completion for child.
+    for (let i = 0; i < nodes.length; i++) {
+      if (selectedItems[ nodes[i].id ]) {
+        nodes[i].complete = true;
+      } else {
+        nodes[i].complete = false;
+      }
+    };
+
+    return nodes;
+  };
+
+  /**
+   * Function to handle selection of items.
+   * @param {*} e TreeView Event.
+   */
   onItemSelection = (e) => {
 
     const { client } = this.props;
 
-    let nodes = e.component.getNodes();
+    let nodes = copyJSON(this.state.items);
     let itemObj = {};
 
-    nodes.forEach(v =>  {
-      itemObj[ v.itemData.id ] = v.itemData;
-    });
+    let selected = e.component.getSelectedNodes();
+
+    nodes = this.setCompletion(nodes, selected);
+
+    for (let i = 0; i < nodes.length; i++) {
+      itemObj[ nodes[i].id ] = nodes[i];
+    };
 
     let propItems = copyJSON(this.props.items);
 
@@ -108,10 +153,17 @@ class TreeViewComp extends React.Component {
     }
   };
 
+  /**
+   * Returns treeview instance.
+   */
   get treeView() {
     return this.treeViewRef.current.instance;
   };
 
+  /**
+   * Removes items from todo list.
+   * @param {*} item Item to remove.
+   */
   removeItem = (item) => {
 
     const { client } = this.props;
@@ -128,6 +180,9 @@ class TreeViewComp extends React.Component {
     });
   };
 
+  /**
+   * Remvoe all completed items from list.
+   */
   removeCompletedItems = () => {
 
     const { client } = this.props;
@@ -142,6 +197,10 @@ class TreeViewComp extends React.Component {
     });
   };
 
+  /**
+   * Edit and item.
+   * @param {*} item Item to edit.
+   */
   editItem = (item) => {
     let items = copyJSON(this.state.items);
 
@@ -154,6 +213,11 @@ class TreeViewComp extends React.Component {
     this.setState({ items });
   };
 
+  /**
+   * Update item's name.
+   * @param {*} item Item to update.
+   * @param {boolean} save Whether to save change or not.
+   */
   updateItemText = (item, save) => {
 
     const { client, notify } = this.props;
@@ -199,8 +263,6 @@ class TreeViewComp extends React.Component {
             );
             data.Todo.get[changedIndex] = updated;
             cache.writeQuery({ query: GET_ALL_TODOS, data });
-  
-            this.setState({ isInEditMode: false });
           }
         });
       }
@@ -210,6 +272,12 @@ class TreeViewComp extends React.Component {
     }
   };
 
+  /**
+   * Triggers whether to update text or not based on key pressed.
+   * @requires this.updateItemText
+   * @param {*} event Browser event.
+   * @param {*} item Item to handle.
+   */
   handleKeyDown = (event, item) => {
     
     event.stopPropagation();
@@ -225,6 +293,10 @@ class TreeViewComp extends React.Component {
     };
   };
 
+  /**
+   * Function to render an item.
+   * @param {*} item Item to render.
+   */
   itemsRender = (item) => {
 
     let _this = this;
@@ -259,6 +331,50 @@ class TreeViewComp extends React.Component {
     );
   };
 
+  /**
+   * Handle drop of an item inside other.
+   * @param {*} e TreeView event.
+   */
+  onDragEnd = (e) => {
+
+    let _this = this;
+
+    if (e.fromIndex === e.toIndex) {
+      return;
+    }
+
+    let viewNodes = this.treeView.element().querySelectorAll('.dx-treeview-node');
+
+    const fromId = viewNodes[e.fromIndex].getAttribute('data-item-id');
+    const toId = viewNodes[e.toIndex].getAttribute('data-item-id');
+
+    let items = copyJSON(this.state.items);
+
+    let node = items.find(v => v.id === fromId);
+    let parentId = "none";
+
+    if (e.dropInsideItem) {
+      parentId = toId;
+    }
+
+    let { client } = _this.props;
+
+    client.mutate({
+      mutation: UPDATE_TODO_MUTATION,
+      variables: { id: node.id, name: node.name, parentId },
+      update: (cache, { data: { Todo } }) => {
+
+        const data = cache.readQuery({ query: GET_ALL_TODOS });
+        const updated = Todo.update;
+
+        const changedIndex = data.Todo.get.findIndex(t => t.id === updated.id);
+
+        data.Todo.get[changedIndex] = updated;
+        cache.writeQuery({ query: GET_ALL_TODOS, data });
+      }
+    });
+  };
+
   render() {
 
     const { view } = this.state;
@@ -284,20 +400,30 @@ class TreeViewComp extends React.Component {
     
     return (
       <div className="form" style={{ position: "relative" }}>
-        <TreeView
-          id={"simple-treeview"}
-          ref={this.treeViewRef}
-          items={items}
-          dataStructure={"plain"}
-          width={500}
-          selectNodesRecursive={false}
-          selectByClick={false}
-          showCheckBoxesMode={"normal"}
-          selectionMode={"multiple"}
-          onSelectionChanged={this.onItemSelection}
-          itemRender={this.itemsRender}
-          { ...propItems }
-        />
+        <Sortable
+          filter=".dx-treeview-item"
+          group="shared"
+          data="item"
+          allowDropInsideItem={true}
+          allowReordering={true}
+          onDragChange={this.onDragChange}
+          onDragEnd={this.onDragEnd}
+        >
+          <TreeView
+            id={"simple-treeview"}
+            ref={this.treeViewRef}
+            items={items}
+            dataStructure={"plain"}
+            width={500}
+            selectNodesRecursive={true}
+            selectByClick={false}
+            showCheckBoxesMode={"normal"}
+            selectionMode={"multiple"}
+            onSelectionChanged={this.onItemSelection}
+            itemRender={this.itemsRender}
+            { ...propItems }
+          />
+        </Sortable>
         <div className={"filters-section"}>
           <span className="todo-count">
             <strong>{ itemCount.left }</strong> <span>{ (itemCount.left === 1) ? "item" : "items" } left</span>

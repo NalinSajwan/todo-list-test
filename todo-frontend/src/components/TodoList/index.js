@@ -15,8 +15,6 @@ const TodoList = (props) => {
         if (loading) return <p>Loading...</p>;
         if (error) return <p>Error</p>;
 
-        console.log("\n[TodoList] data.Todo.get ==> ", data.Todo.get);
-
         return (
           <TreeView
             items={data.Todo.get}
