@@ -2,8 +2,9 @@
 
 `todo-api` for todo app depends on -
 1. apollo-server
-2. graphql
-3. mongoose
+2. express
+3. graphql
+4. mongoose
 
 App has following subdirectory -
 ```

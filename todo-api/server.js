@@ -1,19 +1,21 @@
-const { ApolloServer } = require("apollo-server")
+const express = require('express')
+  , cors = require("cors")
+  , { ApolloServer } = require("apollo-server-express")
   , mongoose = require("./config/mongoose")
   , schema = require('./schema')
 
 // Code variables.
   , port = process.env.PORT || 4000;
 
-const opts = {
-  port: port,
-  endpoint: '/api',
-  playground: '/playground'
-};
+const app = express();
+const path = '/api';
 
-const server = new ApolloServer({ schema });
+app.use("*", cors());
 
-server.listen(opts).then(({ url }) => {
-  console.log(`🚀  Server ready at ${url}`);
+const server = new ApolloServer({ schema, introspection: true, playground: true });
+server.applyMiddleware({ app, path });
+
+app.listen({ port }, () => {
+  console.log(`🚀 Server ready at http://localhost:${port}${server.graphqlPath}`);
   const db = mongoose();
 });
