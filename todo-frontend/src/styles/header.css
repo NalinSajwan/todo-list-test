@@ -1,0 +1,6 @@
+.app-header .navbar .navbar-text {
+  position: absolute;
+  right: 20px;
+  clear: both;
+  cursor: pointer;
+}

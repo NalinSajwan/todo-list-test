@@ -1,0 +1,84 @@
+.todo-section .dx-treeview {
+  height: 350px;
+  padding: 10px 0;
+}
+
+.filters-section {
+  color: #777;
+  padding: 10px;
+  height: 45px;
+  position: relative;
+  border-top: 1px solid #dee2e6;
+  text-align: center;
+}
+
+.filters {
+	margin: 0;
+	padding: 0px;
+	list-style: none;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: calc(100% - 20px);
+  height: 2px;
+}
+
+.filters li {
+	display: inline;
+}
+
+.filters li a {
+	color: inherit;
+	margin: 3px;
+	padding: 3px 7px;
+	text-decoration: none;
+	border: 1px solid transparent;
+	border-radius: 3px;
+}
+
+.filters li a:hover {
+  border-color: rgba(175, 47, 47, 0.1);
+  cursor: pointer;
+}
+
+.filters li a.selected {
+	border-color: rgba(175, 47, 47, 0.2);
+}
+
+.todo-count {
+	float: left;
+	text-align: left;
+}
+
+.todo-count strong {
+  font-weight: 300;
+}
+
+.custom-nav-item .nav-item-action {
+  float: right;
+  margin-right: 20px;
+}
+
+.custom-nav-item .nav-item-action i.icon {
+  margin-left: 5px;
+}
+
+.custom-nav-item input {
+  width: 70%;
+}
+
+.clear-completed {
+  float: right;
+  color: #777;
+  cursor: pointer;
+}
+
+.clear-completed:hover {
+  color: #777;
+  text-decoration: underline;
+}
+
+.dx-empty-message {
+  text-align: center;
+  margin-top: 150px;
+}

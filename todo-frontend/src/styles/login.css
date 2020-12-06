@@ -1,0 +1,25 @@
+.app-login-container {
+  position: relative;
+  max-width: 500px;
+  width: 94%;
+  margin: 0 auto;
+}
+
+.app-login-main-content {
+  background-color: #fff;
+  -o-box-shadow: 0 1px 4px 0 rgba(0,0,0,.25);
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,.25);
+  border-radius: 10px;
+  font-size: 14px;
+  overflow: hidden;
+  width: 100%;
+  padding: 10px;
+}
+
+.app-login-main-content > h2 {
+  margin-left: 10px;
+}
+
+.app-login-main-content > .form > button {
+  float: right;
+}

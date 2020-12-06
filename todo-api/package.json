@@ -1,0 +1,26 @@
+{
+  "name": "todo-api",
+  "version": "1.0.0",
+  "description": "Api endpoint for Todo list app.",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "local": "nodemon server.js"
+  },
+  "keywords": [
+    "Apollo Server",
+    "Graphql",
+    "Mongoose"
+  ],
+  "author": "Nalin Sajwan",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server": "^2.19.0",
+    "graphql": "^15.4.0",
+    "graphql-tools": "^7.0.2",
+    "lodash": "^4.17.20",
+    "mongoose": "^5.11.4"
+  }
+}
