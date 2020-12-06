@@ -44,8 +44,8 @@ class TodoAdd extends React.Component {
     return (
       <div className="add-todo">
         <input
-          type="text"
-          placeholder="Add todo"
+          type={"text"}
+          placeholder={"What needs to be done?"}
           onKeyUp={this.onKeyUp}
           onChange={this.onChange}
           value={name}
