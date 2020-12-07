@@ -79,5 +79,9 @@
 
 .dx-empty-message {
   text-align: center;
-  margin-top: 150px;
+  margin-top: 50px;
+}
+
+.dx-treeview {
+  min-height: 150px;
 }
