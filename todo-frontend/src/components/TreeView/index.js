@@ -301,8 +301,10 @@ class TreeViewComp extends React.Component {
 
     let _this = this;
 
+    let extraClass = (item.complete) ? "complete" : "";
+
     return (
-      <div className={`custom-nav-item`}>
+      <div className={`custom-nav-item ${extraClass}`}>
         <i className={`dx-icon ${ item.icon }`} />
         {
           item.edit
@@ -319,7 +321,7 @@ class TreeViewComp extends React.Component {
           :
           (
             <React.Fragment>
-              <span>{ item[ _this.displayExpr ] }</span>
+              <span className={"item"}>{ item[ _this.displayExpr ] }</span>
               <span className={"nav-item-action"}>
                 <i className={"icon dx-icon-edit"} title={"Edit"} onClick={() => _this.editItem(item)} />
                 <i className={"icon dx-icon-trash"} title={"Delete"} style={{ color: "red" }} onClick={() => _this.removeItem(item)} />

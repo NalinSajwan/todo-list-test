@@ -66,6 +66,11 @@
   width: 70%;
 }
 
+.custom-nav-item.complete > .item {
+  color: darkgrey;
+  text-decoration: line-through;
+}
+
 .clear-completed {
   float: right;
   color: #777;
